@@ -33,7 +33,7 @@
 
       <h4>Click the format button to make the xml code easier to read</h4>
 
-      <button type="button" onclick="myFunction()">Format</button>
+      <button type="button" onclick="xmlFormatter()">Format</button>
 
     </div>
 
@@ -43,31 +43,51 @@
     </div>
 
     <script>
-    function myFunction() {
+    function xmlFormatter() {
         //get text from text area
         var text = document.getElementById("textarea").value;
-        var textStr = text.toString();
-        var textArray = textStr.split("<");
-        var formatted = "";
+        var textStr = text.toString().replace(/^\n|\n$/g, ''); //remove leading newlines
+        var xmlStr = textStr.replace( /(<([a-zA-Z]+\b)[^>]*>)(?!<\/\2>|[\w\s])/g, "$1\n" ) //add newline after tag if no closing tag after
+                            .replace( /(<\/[a-zA-Z]+[^>]*>)/g, "$1\n") //add newline after closing tag
+                            .replace( />\s+(.+?)\s+<(?!\/)/g, ">\n$1\n<") //add newline between sets of brackets and text between
+                            .replace( />(.+?)<([a-zA-Z])/g, ">\n$1\n<$2") //add newline between brackets and text node between
+                            .replace(/\?></, "?>\n<") //header for XML
+        var xmlArray = xmlStr.split("\n")
+        var miniArray;
+        var formatted;
 
-        //is xml case
+        //xml case
         if(textStr.indexOf("<?xml") != -1) {
 
-          //case where opening tag and closing tag are next to each other
-          for (var i in textArray) {
-            console.log(formatted);
-            if (textArray[parseInt(i)+1] == null) {
-              continue;
-            }
-            if (textArray[parseInt(i)+1].substr(1,textArray[parseInt(i)+1].length).indexOf(textArray[i])) {
-              formatted = formatted + "<" + textArray[i] + textArray[parseInt(i)+1] + "\n";
-            }
+          var tabs = '';          //store the current indentation
+          var start = 0;          //starting line
+          if (/^<[?]xml/.test(xmlArray[0]))
+            start++;    //if the first line is a header, ignore it
 
-            //case where it is a single line xml tag
-            else {
-              formatted = formatted + "<" + textArray[i] + "\n";
-            }
+          for (var i = start; i < xmlArray.length; i++) {
+              var line = xmlArray[i].trim();
+
+              //if the line is a closing tag
+              if (/^<[/]/.test(line)) {
+                // remove one tab from the store
+                // add the tabs at the beginning of the line
+                tabs = tabs.replace(/.$/, '');
+                xmlArray[i] = tabs + line;
+              }
+              //if the line is how it should be leave the line as it is
+              else if (/<.*>.*<\/.*>|<.*[^>]\/>/.test(line)) {
+                xmlArray[i] = tabs + line;
+              }
+
+              //if the line starts with an opening tag and does not contain an entire node
+              else {
+                // add the tabs at the beginning of the line
+                // and add one tab to the store
+                xmlArray[i] = tabs + line;
+                tabs += '\t';
+              }
           }
+          formatted = xmlArray.join('\n')
         }
 
         //not xml code case
