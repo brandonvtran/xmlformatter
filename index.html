@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>XML Formatter</title>
+    <link href="https://fonts.googleapis.com/css?family=Archivo+Black|Baloo|Lalezar|Righteous" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+    <!-- CSS style to have left and right halves of the page -->
+    <style type="text/css">
+      #left { position: absolute; left: 0; top: 0; width: 50%; height: 100%; background-color: #343d47; }
+      #right { position: absolute; right: 0; top: 0; width: 50%; height: 100%; background-color: #343d47;}
+      textarea {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 95%;
+        min-height: 500px;
+      }
+    </style>
+  </head>
+
+  <body style="color: white;">
+    <!-- left side contains functionalities to format text-->
+    <div id="left">
+      <h1 style="font-family: 'Source Sans Pro', sans-serif; color: white; float: left;">XML</h1>
+      <h1 style="font-family: 'Source Sans Pro', sans-serif; color: red; float: left;">Formatter</h1>
+      </br></br></br></br>
+
+      <h4>Copy and paste XML code into text area</h4>
+
+      XML Code:<br>
+      <!-- Text box to insert text to be formatted -->
+      <textarea id="textarea"></textarea>
+
+      <h4>Click the format button to make the xml code easier to read</h4>
+
+      <button type="button" onclick="myFunction()">Format</button>
+
+    </div>
+
+    <!-- right side contains the formatted text-->
+    <div id="right">
+      <textarea id="formatted" style="margin-top: 150px;"></textarea>
+    </div>
+
+    <script>
+    function myFunction() {
+        //get text from text area
+        var text = document.getElementById("textarea").value;
+        var textStr = text.toString();
+        var textArray = textStr.split("<");
+        var formatted = "";
+
+        //is xml case
+        if(textStr.indexOf("<?xml") != -1) {
+
+          //case where opening tag and closing tag are next to each other
+          for (var i in textArray) {
+            console.log(formatted);
+            if (textArray[parseInt(i)+1] == null) {
+              continue;
+            }
+            if (textArray[parseInt(i)+1].substr(1,textArray[parseInt(i)+1].length).indexOf(textArray[i])) {
+              formatted = formatted + "<" + textArray[i] + textArray[parseInt(i)+1] + "\n";
+            }
+
+            //case where it is a single line xml tag
+            else {
+              formatted = formatted + "<" + textArray[i] + "\n";
+            }
+          }
+        }
+
+        //not xml code case
+        else {
+          formatted = textStr;
+        }
+
+        //print out formatted text
+        document.getElementById("formatted").innerHTML = formatted;
+    }
+    </script>
+
+  </body>
+</html>
