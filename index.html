@@ -57,7 +57,7 @@
         var formatted;
 
         //xml case
-        if(textStr.indexOf("<?xml") != -1) {
+        if(textStr.indexOf("<") != -1 && textStr.indexOf(">") != -1) {
 
           var tabs = '';          //store the current indentation
           var start = 0;          //starting line
@@ -92,7 +92,7 @@
 
         //not xml code case
         else {
-          formatted = textStr;
+          formatted = "This text is not in XML";
         }
 
         //print out formatted text
